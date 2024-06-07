@@ -2,6 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import Column, Integer, String, ForeignKey
+from datetime import date 
+hoy = date.today()
 
 # se importa información del archivo configuracion
 from configuracion import cadena_base_datos
@@ -35,6 +37,26 @@ class Club(Base):
                           self.nombre, 
                           self.deporte, 
                           self.fundacion)
+    
+    def obtenerEdad(self):
+        return (hoy.year - self.fundacion)
+    
+    def obtenerListaDorsales(self):
+        cadena = ""
+        for s in self.jugadores:
+            cadena += "\n%s" % (s.dorsal)
+        return cadena
+    def obtenerSumaDorsales(self):
+        # Ambas opciones son validas porque en esencia hacen lo mismo
+        # Esto hace uso de una variable acumulativa que va incrementando por cada iteracion
+        #suma = 0
+        #for s in self.jugadores:
+        #    suma += s.dorsal
+
+        # Esto usa el metodo sum que nos permite sumar todos los valores de una lista
+        # La lista se obtiene por medio del uso de listas compresas de python
+        suma = sum([s.dorsal for s in self.jugadores])
+        return suma
 
 class Jugador(Base):
     __tablename__ = 'jugador'
@@ -53,6 +75,9 @@ class Jugador(Base):
         return "Jugador: %s - dorsal:%d - posición: %s" % (
                 self.nombre, self.dorsal, self.posicion)
 
+    def obtenerDorsal(self):
+        return self.dorsal
+    
 Base.metadata.create_all(engine)
 
 
